@@ -3,6 +3,7 @@
 .metals/
 .repo.git/
 .scala-build/
+.tools/
 .venv/
 target/
 project/target/
