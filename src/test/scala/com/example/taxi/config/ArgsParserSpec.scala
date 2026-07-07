@@ -120,4 +120,26 @@ class ArgsParserSpec extends AnyFunSuite {
       case Right(_) => fail("Expected parsing to fail")
     }
   }
+
+  test("parses curated model arguments") {
+    val parsed = ArgsParser.parseCuratedModelArgs(
+      Array(
+        "--cleaned-input",
+        "data/cleaned/yellow_taxi",
+        "--zone-lookup",
+        "data/raw/taxi_zone_lookup/taxi_zone_lookup.csv",
+        "--output",
+        "data/curated"
+      )
+    )
+
+    parsed match {
+      case Right(config) =>
+        assert(config.cleanedInputPath == "data/cleaned/yellow_taxi")
+        assert(config.zoneLookupPath == "data/raw/taxi_zone_lookup/taxi_zone_lookup.csv")
+        assert(config.outputPath == "data/curated")
+      case Left(error) =>
+        fail(error)
+    }
+  }
 }

@@ -54,3 +54,23 @@ For January 2024 Yellow Taxi data, the first cleaning run produced:
 - partition column: `pickup_date`
 
 Observed follow-up: the January source file initially produced a few out-of-month partitions such as `pickup_date=2002-12-31`, `pickup_date=2009-01-01`, and `pickup_date=2023-12-31`. The cleaning job now supports an optional expected pickup-date window, for example `--expected-start-date 2024-01-01 --expected-end-date 2024-02-01`, to remove records that do not belong to the source month.
+
+## Task 5: Curated Modeling Notes
+
+The curated layer models cleaned trips as a star schema:
+
+- `fact_trips`: one row per cleaned taxi trip
+- `dim_date`: one row per pickup date
+- `dim_zone`: TLC taxi zone lookup
+- `dim_payment_type`: payment code lookup
+
+This structure prepares the project for Task 6 analytics because daily summaries, hourly demand, zone rankings, and route rankings can be expressed as joins and groupings over stable curated tables.
+
+For January 2024 Yellow Taxi cleaned data, the first curated build produced:
+
+- `fact_trips`: 2,722,398 rows
+- `dim_date`: 31 rows
+- `dim_zone`: 265 rows
+- `dim_payment_type`: 6 rows
+
+The `fact_trips` table is partitioned by `pickup_date`, matching the most common date-filtered analytics pattern.

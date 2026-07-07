@@ -37,3 +37,54 @@ Schema drift note: newer files can add columns, such as congestion-pricing-relat
 | `trip_duration_minutes` | double | Difference between dropoff and pickup timestamps in minutes |
 | `total_amount_per_mile` | double | `total_amount / trip_distance` |
 | `tip_percentage` | double | `tip_amount / fare_amount * 100`; zero when fare is zero |
+
+## Curated Tables
+
+### fact_trips
+
+| Column | Meaning |
+| --- | --- |
+| `trip_id` | Deterministic hash ID generated from stable trip attributes |
+| `pickup_datetime` | Pickup timestamp |
+| `dropoff_datetime` | Dropoff timestamp |
+| `pickup_date` | Pickup date, also used as partition column |
+| `pickup_hour` | Pickup hour |
+| `pickup_location_id` | Foreign key to `dim_zone.location_id` |
+| `dropoff_location_id` | Foreign key to `dim_zone.location_id` |
+| `passenger_count` | Passenger count |
+| `trip_distance` | Trip distance in miles |
+| `fare_amount` | Fare amount |
+| `tip_amount` | Tip amount |
+| `total_amount` | Total amount |
+| `payment_type_id` | Foreign key to `dim_payment_type.payment_type_id` |
+| `trip_duration_minutes` | Trip duration in minutes |
+| `total_amount_per_mile` | Total amount divided by trip distance |
+| `tip_percentage` | Tip amount divided by fare amount |
+
+### dim_date
+
+| Column | Meaning |
+| --- | --- |
+| `date` | Calendar date |
+| `year` | Calendar year |
+| `month` | Calendar month |
+| `day` | Day of month |
+| `day_of_week` | Short weekday label |
+| `day_of_week_number` | Spark weekday number, 1 = Sunday and 7 = Saturday |
+| `is_weekend` | Weekend flag |
+
+### dim_zone
+
+| Column | Meaning |
+| --- | --- |
+| `location_id` | TLC taxi zone location ID |
+| `borough` | NYC borough |
+| `zone` | Taxi zone name |
+| `service_zone` | TLC service zone |
+
+### dim_payment_type
+
+| Column | Meaning |
+| --- | --- |
+| `payment_type_id` | TLC payment code |
+| `payment_type_description` | Human-readable payment type |

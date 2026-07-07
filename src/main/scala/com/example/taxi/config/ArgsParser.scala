@@ -1,6 +1,6 @@
 package com.example.taxi.config
 
-import com.example.taxi.jobs.{CleanTripsConfig, DataQualityConfig, RawTripIngestionConfig}
+import com.example.taxi.jobs.{CleanTripsConfig, CuratedModelConfig, DataQualityConfig, RawTripIngestionConfig}
 
 import scala.util.Try
 
@@ -39,6 +39,38 @@ object ArgsParser {
           Left("Missing required argument for clean-trips: --output <path>")
       }
     }
+  }
+
+  def parseCuratedModelArgs(args: Array[String]): Either[String, CuratedModelConfig] = {
+    def read(
+        options: List[String],
+        cleanedInputPath: Option[String],
+        zoneLookupPath: Option[String],
+        outputPath: Option[String]
+    ): Either[String, CuratedModelConfig] =
+      options match {
+        case Nil =>
+          (cleanedInputPath, zoneLookupPath, outputPath) match {
+            case (Some(cleaned), Some(zoneLookup), Some(output)) =>
+              Right(CuratedModelConfig(cleanedInputPath = cleaned, zoneLookupPath = zoneLookup, outputPath = output))
+            case _ =>
+              Left("Missing required arguments for build-curated: --cleaned-input <path> --zone-lookup <path> --output <path>")
+          }
+
+        case "--cleaned-input" :: value :: tail =>
+          read(tail, Some(value), zoneLookupPath, outputPath)
+
+        case "--zone-lookup" :: value :: tail =>
+          read(tail, cleanedInputPath, Some(value), outputPath)
+
+        case "--output" :: value :: tail =>
+          read(tail, cleanedInputPath, zoneLookupPath, Some(value))
+
+        case unknown :: _ =>
+          Left(s"Unknown or incomplete argument '$unknown'")
+      }
+
+    read(args.toList, cleanedInputPath = None, zoneLookupPath = None, outputPath = None)
   }
 
   private def parseRawTripArgs(

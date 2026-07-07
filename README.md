@@ -56,6 +56,17 @@ Build the cleaned trips layer:
 sbt "run clean-trips --format parquet --input data/raw/yellow_taxi/year=2024/month=01/yellow_tripdata_2024-01.parquet --output data/cleaned/yellow_taxi --expected-start-date 2024-01-01 --expected-end-date 2024-02-01"
 ```
 
+Build the curated star schema:
+
+```bash
+mkdir -p data/raw/taxi_zone_lookup
+curl -L \
+  -o data/raw/taxi_zone_lookup/taxi_zone_lookup.csv \
+  https://d37ci6vzurychx.cloudfront.net/misc/taxi_zone_lookup.csv
+
+sbt "run build-curated --cleaned-input data/cleaned/yellow_taxi --zone-lookup data/raw/taxi_zone_lookup/taxi_zone_lookup.csv --output data/curated"
+```
+
 ## Test
 
 ```bash
@@ -176,3 +187,35 @@ Interview talking points:
 - Partitioning by pickup date helps date-filtered queries skip irrelevant files.
 - Month-level source files can contain out-of-month timestamps. A configurable expected date window catches those records without hard-coding one month into the job.
 - A production pipeline should record input rows, output rows, and removed rows for auditability.
+
+## Task 5: Curated Star Schema
+
+The curated model turns cleaned trips into a simple star schema for analytics.
+
+Implemented entry point:
+
+```bash
+sbt "run build-curated --cleaned-input data/cleaned/yellow_taxi --zone-lookup data/raw/taxi_zone_lookup/taxi_zone_lookup.csv --output data/curated"
+```
+
+Output tables:
+
+- `data/curated/fact_trips`
+- `data/curated/dim_date`
+- `data/curated/dim_zone`
+- `data/curated/dim_payment_type`
+
+Design choices:
+
+- `fact_trips` contains one row per cleaned trip and stores measurable business events.
+- `dim_date` stores reusable date attributes for grouping by day, month, weekday, and weekend.
+- `dim_zone` comes from the official Taxi Zone Lookup CSV and gives location IDs business meaning.
+- `dim_payment_type` maps numeric TLC payment codes to readable labels.
+- `trip_id` is generated as a deterministic hash from stable trip attributes.
+
+Interview talking points:
+
+- The curated layer is closer to a data warehouse than the raw or cleaned layer.
+- Fact tables hold events and metrics; dimension tables hold descriptive context.
+- A star schema makes downstream OLAP queries simpler and keeps metric definitions consistent.
+- Using dimensions avoids repeating descriptive fields in every fact row and makes joins explicit.
