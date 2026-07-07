@@ -14,7 +14,7 @@ lazy val root = (project in file("."))
     run / fork := true,
     javaOptions ++= Seq(
       "--add-opens=java.base/sun.nio.ch=ALL-UNNAMED",
-      "--add-opens=java.base/java.nio=ALL-UNNAMED"
+      "--add-opens=java.base/java.nio=ALL-UNNAMED",
+      "--add-opens=java.base/sun.util.calendar=ALL-UNNAMED"
     )
   )
-

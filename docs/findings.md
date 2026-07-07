@@ -22,3 +22,35 @@ The quality report currently measures:
 - abnormal passenger counts
 
 These metrics are intended to describe raw data problems before cleaning. They should be compared with cleaned-layer row counts in Task 4.
+
+For January 2024 Yellow Taxi data, the first quality report found:
+
+- total rows: 2,964,624
+- duplicate rows: 0
+- invalid trip distance rows: 60,371
+- negative fare rows: 37,448
+- pickup after dropoff rows: 56
+- abnormal passenger count rows: 171,628
+- null passenger count rows: 140,162
+
+## Task 4: Cleaning Notes
+
+The cleaned layer applies deterministic filters based on Task 3 quality checks and adds reusable derived columns:
+
+- `pickup_date`
+- `pickup_hour`
+- `trip_duration_minutes`
+- `total_amount_per_mile`
+- `tip_percentage`
+
+The cleaned output is written as Parquet and partitioned by `pickup_date`, which supports common date-filtered analytics queries.
+
+For January 2024 Yellow Taxi data, the first cleaning run produced:
+
+- input rows: 2,964,624
+- output rows: 2,722,415
+- removed rows: 242,209
+- output path: `data/cleaned/yellow_taxi`
+- partition column: `pickup_date`
+
+Observed follow-up: the January source file initially produced a few out-of-month partitions such as `pickup_date=2002-12-31`, `pickup_date=2009-01-01`, and `pickup_date=2023-12-31`. The cleaning job now supports an optional expected pickup-date window, for example `--expected-start-date 2024-01-01 --expected-end-date 2024-02-01`, to remove records that do not belong to the source month.

@@ -27,3 +27,13 @@ The initial ingestion job targets NYC TLC Yellow Taxi trip records.
 | `Airport_fee` | double | Airport fee |
 
 Schema drift note: newer files can add columns, such as congestion-pricing-related fields. Raw ingestion currently selects the columns needed by the first project milestones; schema drift handling will be revisited when quality checks and curated modeling are added.
+
+## Cleaned Trip Derived Columns
+
+| Column | Type | Meaning |
+| --- | --- | --- |
+| `pickup_date` | date | Date extracted from pickup timestamp |
+| `pickup_hour` | integer | Hour extracted from pickup timestamp |
+| `trip_duration_minutes` | double | Difference between dropoff and pickup timestamps in minutes |
+| `total_amount_per_mile` | double | `total_amount / trip_distance` |
+| `tip_percentage` | double | `tip_amount / fare_amount * 100`; zero when fare is zero |

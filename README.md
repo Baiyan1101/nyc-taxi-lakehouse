@@ -50,6 +50,12 @@ Run a data quality report:
 sbt "run quality-report --format parquet --input data/raw/yellow_taxi/year=2024/month=01/yellow_tripdata_2024-01.parquet --output data/reports/quality/yellow_taxi/year=2024/month=01"
 ```
 
+Build the cleaned trips layer:
+
+```bash
+sbt "run clean-trips --format parquet --input data/raw/yellow_taxi/year=2024/month=01/yellow_tripdata_2024-01.parquet --output data/cleaned/yellow_taxi --expected-start-date 2024-01-01 --expected-end-date 2024-02-01"
+```
+
 ## Test
 
 ```bash
@@ -126,3 +132,47 @@ Interview talking points:
 - Data quality rules should be explicit, measurable, and repeatable. They become a contract between raw data and downstream tables.
 - Some quality rules are technical, such as null checks and duplicate checks. Others are business rules, such as valid distance, valid fare, and valid trip duration.
 - Quality reports should usually be generated before cleaning so the team can explain how much data was removed or corrected later.
+
+## Task 4: Cleaned Trips Layer
+
+The cleaning job applies the data quality rules and writes analytics-friendly Parquet data to the cleaned layer.
+
+Implemented entry point:
+
+```bash
+sbt "run clean-trips --format parquet --input <raw-path> --output data/cleaned/yellow_taxi --expected-start-date 2024-01-01 --expected-end-date 2024-02-01"
+```
+
+Cleaning rules:
+
+- Remove rows where pickup or dropoff timestamp is null.
+- Remove rows where `trip_distance <= 0`.
+- Remove rows where `fare_amount < 0`.
+- Remove rows where `passenger_count` is null, `<= 0`, or `> 8`.
+- Compute `trip_duration_minutes`.
+- Remove rows where trip duration is `<= 0`.
+- Remove rows where trip duration is greater than 6 hours.
+- Optionally remove rows outside an expected pickup date window.
+
+Derived columns:
+
+- `pickup_date`
+- `pickup_hour`
+- `trip_duration_minutes`
+- `total_amount_per_mile`
+- `tip_percentage`
+
+Output design:
+
+- Format: Parquet
+- Path: `data/cleaned/yellow_taxi`
+- Partition column: `pickup_date`
+
+Interview talking points:
+
+- Task 3 measures data problems; Task 4 applies deterministic cleaning rules.
+- Cleaning should be explainable: every removed row should map back to an explicit rule.
+- Writing cleaned data as Parquet improves downstream analytical query performance.
+- Partitioning by pickup date helps date-filtered queries skip irrelevant files.
+- Month-level source files can contain out-of-month timestamps. A configurable expected date window catches those records without hard-coding one month into the job.
+- A production pipeline should record input rows, output rows, and removed rows for auditability.
