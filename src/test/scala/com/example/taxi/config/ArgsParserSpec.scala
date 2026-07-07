@@ -33,4 +33,26 @@ class ArgsParserSpec extends AnyFunSuite {
       case Right(_) => fail("Expected parsing to fail")
     }
   }
+
+  test("parses data quality output path") {
+    val parsed = ArgsParser.parseDataQualityArgs(
+      Array(
+        "--format",
+        "parquet",
+        "--input",
+        "data/raw/yellow_taxi/year=2024/month=01/",
+        "--output",
+        "data/reports/quality/yellow_taxi/year=2024/month=01"
+      )
+    )
+
+    parsed match {
+      case Right(config) =>
+        assert(config.ingestionConfig.inputFormat == "parquet")
+        assert(config.ingestionConfig.inputPaths == Seq("data/raw/yellow_taxi/year=2024/month=01/"))
+        assert(config.outputPath.contains("data/reports/quality/yellow_taxi/year=2024/month=01"))
+      case Left(error) =>
+        fail(error)
+    }
+  }
 }

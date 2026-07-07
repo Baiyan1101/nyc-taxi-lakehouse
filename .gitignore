@@ -16,11 +16,13 @@ data/raw/*
 data/cleaned/*
 data/curated/*
 data/analytics/*
+data/reports/*
 !data/.gitkeep
 !data/raw/.gitkeep
 !data/cleaned/.gitkeep
 !data/curated/.gitkeep
 !data/analytics/.gitkeep
+!data/reports/.gitkeep
 
 docs/*.png
 docs/*.jpg
