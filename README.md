@@ -67,6 +67,12 @@ curl -L \
 sbt "run build-curated --cleaned-input data/cleaned/yellow_taxi --zone-lookup data/raw/taxi_zone_lookup/taxi_zone_lookup.csv --output data/curated"
 ```
 
+Build analytics-ready aggregate tables:
+
+```bash
+sbt "run build-analytics --curated-input data/curated --output data/analytics --top-n 10"
+```
+
 ## Test
 
 ```bash
@@ -219,3 +225,41 @@ Interview talking points:
 - Fact tables hold events and metrics; dimension tables hold descriptive context.
 - A star schema makes downstream OLAP queries simpler and keeps metric definitions consistent.
 - Using dimensions avoids repeating descriptive fields in every fact row and makes joins explicit.
+
+## Task 6: Analytics Aggregates
+
+The analytics layer stores precomputed aggregate tables for common reporting and dashboard queries.
+
+Implemented entry point:
+
+```bash
+sbt "run build-analytics --curated-input data/curated --output data/analytics --top-n 10"
+```
+
+Output tables:
+
+- `data/analytics/daily_trip_summary`
+- `data/analytics/hourly_demand_summary`
+- `data/analytics/top_pickup_zones`
+- `data/analytics/top_dropoff_zones`
+- `data/analytics/top_routes`
+- `data/analytics/top_tip_zones`
+
+Metric examples:
+
+- Daily total trips
+- Daily total revenue
+- Daily average fare
+- Daily average trip distance
+- Daily average trip duration
+- Hourly trip demand
+- Top pickup and dropoff zones
+- Top routes by revenue
+- Pickup zones with highest average tip percentage
+
+Interview talking points:
+
+- The analytics layer is optimized for repeated reads by downstream BI tools or notebooks.
+- Aggregating from curated fact and dimension tables keeps metric definitions consistent.
+- Precomputing common aggregates reduces repeated scan and shuffle work for dashboards.
+- Ranking tables such as top routes usually require joins with dimensions to make IDs human-readable.

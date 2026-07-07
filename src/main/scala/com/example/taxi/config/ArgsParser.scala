@@ -1,6 +1,6 @@
 package com.example.taxi.config
 
-import com.example.taxi.jobs.{CleanTripsConfig, CuratedModelConfig, DataQualityConfig, RawTripIngestionConfig}
+import com.example.taxi.jobs.{AnalyticsConfig, CleanTripsConfig, CuratedModelConfig, DataQualityConfig, RawTripIngestionConfig}
 
 import scala.util.Try
 
@@ -71,6 +71,41 @@ object ArgsParser {
       }
 
     read(args.toList, cleanedInputPath = None, zoneLookupPath = None, outputPath = None)
+  }
+
+  def parseAnalyticsArgs(args: Array[String]): Either[String, AnalyticsConfig] = {
+    def read(
+        options: List[String],
+        curatedInputPath: Option[String],
+        outputPath: Option[String],
+        topN: Int
+    ): Either[String, AnalyticsConfig] =
+      options match {
+        case Nil =>
+          (curatedInputPath, outputPath) match {
+            case (Some(curated), Some(output)) =>
+              Right(AnalyticsConfig(curatedInputPath = curated, outputPath = output, topN = topN))
+            case _ =>
+              Left("Missing required arguments for build-analytics: --curated-input <path> --output <path>")
+          }
+
+        case "--curated-input" :: value :: tail =>
+          read(tail, Some(value), outputPath, topN)
+
+        case "--output" :: value :: tail =>
+          read(tail, curatedInputPath, Some(value), topN)
+
+        case "--top-n" :: value :: tail =>
+          Try(value.toInt).toOption match {
+            case Some(n) if n > 0 => read(tail, curatedInputPath, outputPath, n)
+            case _ => Left(s"Invalid --top-n value '$value'. Use a positive integer.")
+          }
+
+        case unknown :: _ =>
+          Left(s"Unknown or incomplete argument '$unknown'")
+      }
+
+    read(args.toList, curatedInputPath = None, outputPath = None, topN = 10)
   }
 
   private def parseRawTripArgs(

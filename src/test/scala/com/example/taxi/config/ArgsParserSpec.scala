@@ -142,4 +142,26 @@ class ArgsParserSpec extends AnyFunSuite {
         fail(error)
     }
   }
+
+  test("parses analytics arguments") {
+    val parsed = ArgsParser.parseAnalyticsArgs(
+      Array(
+        "--curated-input",
+        "data/curated",
+        "--output",
+        "data/analytics",
+        "--top-n",
+        "5"
+      )
+    )
+
+    parsed match {
+      case Right(config) =>
+        assert(config.curatedInputPath == "data/curated")
+        assert(config.outputPath == "data/analytics")
+        assert(config.topN == 5)
+      case Left(error) =>
+        fail(error)
+    }
+  }
 }

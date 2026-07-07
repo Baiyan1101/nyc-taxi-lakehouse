@@ -88,3 +88,57 @@ Schema drift note: newer files can add columns, such as congestion-pricing-relat
 | --- | --- |
 | `payment_type_id` | TLC payment code |
 | `payment_type_description` | Human-readable payment type |
+
+## Analytics Tables
+
+### daily_trip_summary
+
+| Column | Meaning |
+| --- | --- |
+| `pickup_date` | Trip pickup date |
+| `trip_count` | Number of trips |
+| `total_revenue` | Sum of `total_amount` |
+| `avg_fare_amount` | Average fare amount |
+| `avg_trip_distance` | Average trip distance |
+| `avg_trip_duration_minutes` | Average trip duration |
+
+### hourly_demand_summary
+
+| Column | Meaning |
+| --- | --- |
+| `pickup_hour` | Pickup hour, 0-23 |
+| `trip_count` | Number of trips |
+
+### top_pickup_zones / top_dropoff_zones
+
+| Column | Meaning |
+| --- | --- |
+| `location_id` | Taxi zone ID |
+| `borough` | Borough name |
+| `zone` | Taxi zone name |
+| `trip_count` | Number of trips |
+| `total_revenue` | Sum of total trip amount |
+
+### top_routes
+
+| Column | Meaning |
+| --- | --- |
+| `pickup_location_id` | Pickup zone ID |
+| `pickup_borough` | Pickup borough |
+| `pickup_zone` | Pickup zone name |
+| `dropoff_location_id` | Dropoff zone ID |
+| `dropoff_borough` | Dropoff borough |
+| `dropoff_zone` | Dropoff zone name |
+| `trip_count` | Number of trips on the route |
+| `total_revenue` | Total route revenue |
+| `avg_total_amount` | Average total amount per trip |
+
+### top_tip_zones
+
+| Column | Meaning |
+| --- | --- |
+| `location_id` | Pickup zone ID |
+| `borough` | Borough name |
+| `zone` | Taxi zone name |
+| `trip_count` | Number of trips |
+| `avg_tip_percentage` | Average tip percentage |

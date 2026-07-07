@@ -74,3 +74,25 @@ For January 2024 Yellow Taxi cleaned data, the first curated build produced:
 - `dim_payment_type`: 6 rows
 
 The `fact_trips` table is partitioned by `pickup_date`, matching the most common date-filtered analytics pattern.
+
+## Task 6: Analytics Notes
+
+The analytics layer generates reusable aggregate tables from the curated star schema:
+
+- `daily_trip_summary`
+- `hourly_demand_summary`
+- `top_pickup_zones`
+- `top_dropoff_zones`
+- `top_routes`
+- `top_tip_zones`
+
+These outputs are designed to answer common business questions without repeatedly scanning the row-level fact table.
+
+For January 2024 Yellow Taxi curated data, the first analytics build produced:
+
+- `daily_trip_summary`: 31 rows
+- `hourly_demand_summary`: 24 rows
+- `top_pickup_zones`: 10 rows
+- `top_dropoff_zones`: 10 rows
+- `top_routes`: 10 rows
+- `top_tip_zones`: 10 rows

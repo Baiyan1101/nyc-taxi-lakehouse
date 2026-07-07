@@ -20,3 +20,5 @@ dim_zone -- fact_trips -- dim_payment_type
 ```
 
 `fact_trips` stores trip events and measurable values. Dimensions store descriptive attributes used for grouping, filtering, and joining.
+
+The analytics layer stores precomputed OLAP aggregates derived from the curated model. These tables are designed for repeated consumption by SQL queries, notebooks, or dashboards rather than row-level processing.
